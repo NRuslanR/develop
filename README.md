@@ -1,2 +1,1 @@
-# hello-world
-contains the testing files needed for creating this repository
+i'm learning a git and a github now
