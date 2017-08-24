@@ -1,0 +1,25 @@
+#include <boost/asio.hpp>
+
+using namespace boost;
+using namespace asio;
+
+int main(int argc, char** argv)
+{
+io_service io;
+ip::tcp::acceptor accept(ip::tcp::endpoint(atoi(argv[1]), ip::tcp::v4()));
+asio::spawn(io, [&acceptor](yield_context yield) {
+
+while(true)
+{
+ip::tcp::socket client;
+acceptor.async_accept(client, yield);
+string msg = "";
+size_t bytes = client.async_write(asio::buffer(msg, msg.length()), yield);
+}
+
+}
+);
+
+io.run();
+}
+
