@@ -1,0 +1,61 @@
+#include <boost/asio.hpp>
+#include <boost/atomic.hpp>
+#include <boost/thread.hpp>
+#include <iostream>
+
+using namespace boost;
+using namespace asio;
+using namespace std;
+
+int main(int argc, char** argv)
+{
+if(argc < 2)
+{
+cout << "incorrect argument list" << endl;
+return -1;
+}
+atomic_bool is_done(false);
+int port = atoi(argv[1]);
+
+if(port < 1023 || port > 49151)
+{
+cout << "incorrect port number" << endl;
+return -2;
+}
+boost::thread server_thread([&is_done, port] {
+io_service io;
+
+asio::spawn(io, [&is_done, port](yield_context yield) {
+ip::tcp::acceptor acceptor(ip::tcp::endpoint(port, ip::tcp::v4()));
+while(!is_done.load(boost::memory_order_acquire))
+{
+ip::tcp::socket client;
+acceptor.async_accept(client, yield);
+string msg = "";
+size_t bytes = client.async_write(asio::buffer(msg, msg.length()), yield);
+}
+
+}
+);
+
+io.run();
+});
+
+cout << "Enter something for stopping a server when you will be need in it" << endl;
+
+string ending;
+
+while(getline(cin, ending)) {
+if(ending.empty()) {
+cin.clear();
+}
+else
+{
+is_done.store(true, boost::memory_order_relaxed);
+break;
+}
+}
+
+server_thread.join();
+return 0;
+}
