@@ -1,5 +1,0 @@
-cmake_minumum_required(2.8)
-project(test)
-set(LIBS "")
-add_executable(test main.cpp)
-target_link_libraries(test ${LIBS})
